@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Your Account{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        .register-container {
+            max-width: 900px;
+            margin: 40px auto;
+        }
+        
+        /* Left Column Branding */
+        .register-info {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-radius: 15px 0 0 15px;
+        }
+
+        /* Right Column Form */
+        .register-form-card {
+            background: #fff;
+            padding: 40px;
+            border-radius: 0 15px 15px 0;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        /* Modern Input Styling */
+        input {
+            border: 1px solid #e0e0e0 !important;
+            padding: 12px 15px !important;
+            font-size: 0.95rem !important;
+            border-radius: 10px !important;
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #4361ee !important;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1) !important;
+            outline: none;
+        }
+
+        @media (max-width: 768px) {
+            .register-info { border-radius: 15px 15px 0 0; }
+            .register-form-card { border-radius: 0 0 15px 15px; }
+        }
+    </style>
+{% endblock css %}
+
+{% block content %}
+<div class="container">
+    <div class="row g-0 register-container shadow-lg">
+        <div class="col-md-5 register-info text-center text-md-start">
+            <h2 class="text-white fw-bold mb-4">Join Us!</h2>
+            <p class="mb-4 opacity-75">Take control of your finances today. Track every penny and reach your savings goals faster.</p>
+            
+            <ul class="list-unstyled">
+                <li class="mb-3"><i class="fas fa-check-circle me-2"></i> Set Monthly Budgets</li>
+                <li class="mb-3"><i class="fas fa-check-circle me-2"></i> Detailed Expense Reports</li>
+                <li class="mb-3"><i class="fas fa-check-circle me-2"></i> Secure Cloud Backup</li>
+            </ul>
+        </div>
+
+        <div class="col-md-7 register-form-card">
+            <div class="mb-4">
+                <h3 class="fw-bold">Register</h3>
+                <p class="text-muted small">Already have an account? <a href="{% url 'user_login' %}" class="text-primary text-decoration-none">Login here</a></p>
+            </div>
+
+            <form method="post" action="{% url 'user_register' %}">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors }}</div>{% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email Address</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors }}</div>{% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Password</label>
+                        {{ form.password1 }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Confirm Password</label>
+                        {{ form.password2 }}
+                    </div>
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger py-2 small">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg py-3 fs-6">Create Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

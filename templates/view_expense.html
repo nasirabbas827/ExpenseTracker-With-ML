@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Expense History | Expense Tracker{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-card {
+            background: #fff;
+            border-radius: 15px;
+            border: none;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .amount-text {
+            font-weight: 700;
+            color: #dc3545; /* Danger Red */
+        }
+
+        .form-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+
+        .btn-filter {
+            background: #4361ee;
+            color: white;
+            border-radius: 8px;
+        }
+
+        .btn-export {
+            background: #10b981;
+            color: white;
+            border-radius: 8px;
+        }
+
+        .category-pill {
+            background: rgba(238, 9, 121, 0.1);
+            color: #ee0979;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+    </style>
+{% endblock css %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h2 class="fw-bold mb-1">Expense History</h2>
+            <p class="text-muted small">Analyze and manage your spending</p>
+        </div>
+        <a href="{% url 'add_expense' %}" class="btn btn-danger px-4 py-2 shadow-sm rounded-pill" style="background: linear-gradient(135deg, #ee0979, #ff6a00); border: none;">
+            <i class="fas fa-plus-circle me-2"></i> Add Expense
+        </a>
+    </div>
+
+    <div class="filter-card">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-2">
+                <label for="start_date" class="form-label">Start Date</label>
+                <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request.GET.start_date }}">
+            </div>
+            <div class="col-md-2">
+                <label for="end_date" class="form-label">End Date</label>
+                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ request.GET.end_date }}">
+            </div>
+            <div class="col-md-2">
+                <label for="min_amount" class="form-label">Min (RS )</label>
+                <input type="number" name="min_amount" id="min_amount" class="form-control" placeholder="0.00" value="{{ request.GET.min_amount }}" step="0.01">
+            </div>
+            <div class="col-md-2">
+                <label for="max_amount" class="form-label">Max (RS )</label>
+                <input type="number" name="max_amount" id="max_amount" class="form-control" placeholder="0.00" value="{{ request.GET.max_amount }}" step="0.01">
+            </div>
+            <div class="col-md-2">
+                <label for="category" class="form-label">Category</label>
+                <input type="text" name="category" id="category" class="form-control" placeholder="Search..." value="{{ request.GET.category }}">
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-filter w-100" title="Apply Filters">
+                    <i class="fas fa-filter"></i>
+                </button>
+                <a href="{% url 'export_expense_csv' %}" class="btn btn-export w-100" title="Export CSV">
+                    <i class="fas fa-file-csv"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-container shadow-sm mb-5">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-4">Date</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Note</th>
+                        <th class="text-center pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr>
+                        <td class="ps-4 fw-medium text-muted small">
+                            {{ expense.date|date:"M d, Y" }}
+                        </td>
+                        <td>
+                            <span class="category-pill">
+                                <i class="fas fa-tag me-1 small"></i> {{ expense.category.name }}
+                            </span>
+                        </td>
+                        <td><span class="amount-text">-RS {{ expense.amount }}</span></td>
+                        <td><small class="text-muted">{{ expense.note|default:"—" }}</small></td>
+                        <td class="text-center pe-4">
+                            <div class="btn-group">
+                                <a href="{% url 'edit_expense' expense.expense_id %}" class="btn btn-sm btn-outline-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'delete_expense' expense.expense_id %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <i class="fas fa-receipt fa-3x mb-3 text-light"></i>
+                            <p class="text-muted">No expense records found.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}

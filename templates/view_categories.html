@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Categories | Expense Tracker{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden; /* Ensures the dark header respects the rounded corners */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-add-new {
+            background: var(--primary-gradient);
+            border: none;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        /* Adjusting the standard Bootstrap table for a cleaner look */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .category-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+    </style>
+{% endblock css %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h2 class="fw-bold mb-1">Categories</h2>
+            <p class="text-muted small">Manage your spending classifications</p>
+        </div>
+        <a href="{% url 'add_category' %}" class="btn btn-primary btn-add-new px-4 py-2">
+            <i class="fas fa-plus me-2"></i> Add New Category
+        </a>
+    </div>
+
+    <div class="table-container shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col" class="ps-4"># ID</th>
+                        <th scope="col">Category Name</th>
+                        <th scope="col" class="text-center pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <tr>
+                        <td class="ps-4"><span class="text-muted">#{{ category.category_id }}</span></td>
+                        <td>
+                            <span class="category-name text-primary">
+                                <i class="fas fa-tag me-2 opacity-50"></i>{{ category.name }}
+                            </span>
+                        </td>
+                        <td class="text-center pe-4">
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'edit_category' category.category_id %}" class="btn btn-sm btn-outline-warning">
+                                    <i class="fas fa-edit me-1"></i> Edit
+                                </a>
+                                <a href="{% url 'delete_category' category.category_id %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash me-1"></i> Delete
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="fas fa-folder-open fa-3x mb-3 opacity-25"></i>
+                                <p>No categories found. Start by adding one!</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+
+
+Why Here on edit it is giving me @login_required
+def view_categories(request):
+    categories = Category.objects.all().order_by('name')
+    return render(request, 'view_categories.html', {'categories': categories})
+
+
+@login_required
+def edit_category(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Category updated successfully.')
+            return redirect('view_categories')
+    else:
+        form = CategoryForm(instance=category)
+
+    return render(request, 'edit_category.html', {
+        'form': form,
+        'category': category
+    })
+TypeError at /categories/edit/7/
+edit_category() got an unexpected keyword argument 'category_id'
+Request Method:	GET
+Request URL:	http://127.0.0.1:8000/categories/edit/7/
+Django Version:	4.2.12
+Exception Type:	TypeError
+Exception Value:	
+edit_category() got an unexpected keyword argument 'category_id'
+Exception Location:	C:\Users\NASIR ABBAS\AppData\Local\Programs\Python\Python39\lib\site-packages\django\contrib\auth\decorators.py, line 23, in _wrapper_view
+Raised during:	myapp.views.edit_category
+Python Executable:	C:\Users\NASIR ABBAS\AppData\Local\Programs\Python\Python39\python.exe
+Python Version:	3.9.7

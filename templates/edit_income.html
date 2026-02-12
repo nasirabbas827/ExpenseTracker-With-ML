@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Income | Expense Tracker{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        .income-wrapper {
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        /* Left Side: Edit Branding */
+        .income-edit-side {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            padding: 45px;
+            border-radius: 20px 0 0 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Right Side: Form */
+        .income-form-side {
+            background: #ffffff;
+            padding: 45px;
+            border-radius: 0 20px 20px 0;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        /* Consistent Modern Inputs */
+        input:not([type="checkbox"]), select, textarea {
+            border: 1px solid #e2e8f0 !important;
+            padding: 12px 15px !important;
+            border-radius: 10px !important;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        input:focus, select:focus {
+            border-color: #11998e !important;
+            box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.1) !important;
+            outline: none;
+        }
+
+        .edit-icon-badge {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .btn-update {
+            background: linear-gradient(135deg, #11998e, #0f8a7e);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 12px 25px;
+            border-radius: 10px;
+        }
+
+        .btn-update:hover {
+            color: white;
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .income-edit-side { border-radius: 20px 20px 0 0; }
+            .income-form-side { border-radius: 0 0 20px 20px; }
+        }
+    </style>
+{% endblock css %}
+
+{% block content %}
+<div class="container">
+    <div class="row g-0 income-wrapper shadow-lg">
+        <div class="col-md-5 income-edit-side text-center text-md-start">
+            <div class="edit-icon-badge mx-auto mx-md-0">
+                <i class="fas fa-file-invoice-dollar"></i>
+            </div>
+            <h3 class="fw-bold text-white">Edit Record</h3>
+            <p class="text-white-50 small mb-4">You are currently modifying an income entry. Ensure the amounts and dates remain accurate for correct financial reporting.</p>
+            
+            <div class="bg-black bg-opacity-10 p-3 rounded-3 border border-white border-opacity-10">
+                <p class="small mb-0">
+                    <i class="fas fa-info-circle me-2"></i> 
+                    Changes will be updated in your dashboard immediately.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-7 income-form-side">
+            <h3 class="fw-bold mb-2">Update Income</h3>
+            <p class="text-muted small mb-4">Adjust the details of this transaction below.</p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                {% for field in form %}
+                <div class="mb-3">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <div class="d-flex gap-2 pt-3">
+                    <button type="submit" class="btn btn-update">
+                        <i class="fas fa-check-circle me-2"></i>Save Changes
+                    </button>
+                    <a href="{% url 'view_income' %}" class="btn btn-light px-4 py-2 text-muted">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

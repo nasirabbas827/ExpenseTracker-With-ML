@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Login | Expense Tracker{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        .login-container {
+            max-width: 900px;
+            margin: 60px auto;
+            border: none;
+        }
+        
+        /* Left Column Illustration/Info */
+        .login-brand-side {
+            background: linear-gradient(135deg, #6c757d, #343a40);
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-radius: 15px 0 0 15px;
+        }
+
+        /* Right Column Form */
+        .login-form-side {
+            background: #ffffff;
+            padding: 50px;
+            border-radius: 0 15px 15px 0;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        /* Modern Inputs - same as registration */
+        input {
+            border: 1px solid #e0e0e0 !important;
+            padding: 12px 15px !important;
+            font-size: 0.95rem !important;
+            border-radius: 10px !important;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #4361ee !important;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1) !important;
+            outline: none;
+        }
+
+        .login-btn {
+            background: var(--primary-gradient);
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.25);
+        }
+
+        @media (max-width: 768px) {
+            .login-brand-side { 
+                border-radius: 15px 15px 0 0; 
+                text-align: center; 
+                padding: 30px 20px;
+            }
+            .login-form-side { 
+                border-radius: 0 0 15px 15px; 
+                padding: 30px 20px;
+            }
+        }
+    </style>
+{% endblock css %}
+
+{% block content %}
+<div class="container">
+    <div class="row g-0 login-container shadow-lg">
+        
+        <!-- Left side - branding -->
+        <div class="col-md-5 login-brand-side text-center text-md-start">
+            <div class="mb-4">
+                <i class="fas fa-unlock-alt fa-3x mb-3 text-info"></i>
+            </div>
+            <h2 class="text-white fw-bold mb-3">Welcome Back!</h2>
+            <p class="opacity-75 mb-4">Sign in to continue tracking your expenses<br>and managing your budgets.</p>
+            <div class="mt-4 d-none d-md-block">
+                <small class="opacity-50 text-uppercase tracking-wider">Secure Access</small>
+            </div>
+        </div>
+
+        <!-- Right side - form -->
+        <div class="col-md-7 login-form-side">
+            <div class="mb-4">
+                <h3 class="fw-bold">Login</h3>
+                <p class="text-muted small">
+                    Don't have an account? 
+                    <a href="{% url 'user_register' %}" class="text-primary text-decoration-none fw-bold">Register here</a>
+                </p>
+            </div>
+
+            <!-- General / non-field errors -->
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2 small border-0 shadow-sm mb-4" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    {{ form.non_field_errors|join:" " }}
+                </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'user_login' %}" novalidate>
+                {% csrf_token %}
+
+                <!-- Username -->
+                <div class="mb-3">
+                    <label class="form-label" for="{{ form.username.id_for_label }}">Username</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="text-danger small mt-1">{{ form.username.errors|join:" " }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Password -->
+                <div class="mb-4">
+                    <label class="form-label" for="{{ form.password.id_for_label }}">Password</label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <div class="text-danger small mt-1">{{ form.password.errors|join:" " }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Submit button -->
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary login-btn">Sign In</button>
+                </div>
+            </form>
+
+            <!-- Footer note -->
+            <div class="mt-4 pt-3 border-top text-center">
+                <p class="text-muted x-small mb-0">
+                    By logging in, you agree to our 
+                    <a href="#" class="text-decoration-none">Terms of Service</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

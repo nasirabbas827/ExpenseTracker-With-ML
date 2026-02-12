@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Expense | Expense Tracker{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        .expense-wrapper {
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        /* Left Side: Edit Branding */
+        .expense-edit-side {
+            background: linear-gradient(135deg, #6a11cb, #ff4b2b);
+            color: white;
+            padding: 45px;
+            border-radius: 20px 0 0 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Right Side: Form */
+        .expense-form-side {
+            background: #ffffff;
+            padding: 45px;
+            border-radius: 0 20px 20px 0;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        /* Consistent Modern Inputs */
+        input:not([type="checkbox"]), select, textarea {
+            border: 1px solid #e2e8f0 !important;
+            padding: 12px 15px !important;
+            border-radius: 10px !important;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        input:focus, select:focus {
+            border-color: #6a11cb !important;
+            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1) !important;
+            outline: none;
+        }
+
+        .edit-icon-badge {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .btn-update-expense {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 12px 25px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-update-expense:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .expense-edit-side { border-radius: 20px 20px 0 0; }
+            .expense-form-side { border-radius: 0 0 20px 20px; }
+        }
+    </style>
+{% endblock css %}
+
+{% block content %}
+<div class="container">
+    <div class="row g-0 expense-wrapper shadow-lg">
+        <div class="col-md-5 expense-edit-side text-center text-md-start">
+            <div class="edit-icon-badge mx-auto mx-md-0">
+                <i class="fas fa-edit"></i>
+            </div>
+            <h3 class="fw-bold text-white">Modify Expense</h3>
+            <p class="text-white-50 small mb-4">Update the details of this transaction to keep your budget accurate. Changes will be reflected in your reports immediately.</p>
+            
+            <div class="bg-white bg-opacity-10 p-3 rounded-3 border border-white border-opacity-10">
+                <p class="small mb-0">
+                    <i class="fas fa-history me-2"></i> 
+                    Check the date and category carefully before saving.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-7 expense-form-side">
+            <h3 class="fw-bold mb-2">Edit Transaction</h3>
+            <p class="text-muted small mb-4">Adjust the expense information below.</p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                {% for field in form %}
+                <div class="mb-3">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <div class="d-flex gap-2 pt-3">
+                    <button type="submit" class="btn btn-update-expense">
+                        <i class="fas fa-save me-2"></i>Update Expense
+                    </button>
+                    <a href="{% url 'view_expense' %}" class="btn btn-light px-4 py-2 text-muted">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

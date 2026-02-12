@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Profile | Expense Tracker{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        .profile-wrapper {
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        .profile-card {
+            background: #fff;
+            border-radius: 20px;
+            border: none;
+            overflow: hidden;
+        }
+
+        /* Sidebar info section */
+        .profile-stat-side {
+            background: #f8faff;
+            padding: 40px 30px;
+            border-right: 1px solid #edf2f7;
+        }
+
+        .profile-img-container {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 20px;
+        }
+
+        .current-photo, .default-photo {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .default-photo {
+            background: var(--primary-gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        /* Information Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 20px;
+        }
+
+        .info-item label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #a0aec0;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .info-item p {
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 0;
+        }
+
+        /* Form Styling */
+        .form-side {
+            padding: 40px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        /* Target Django fields */
+        input:not([type="file"]), select, textarea {
+            border: 1px solid #e2e8f0 !important;
+            padding: 10px 15px !important;
+            border-radius: 10px !important;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        input:focus {
+            border-color: #4361ee !important;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1) !important;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            background: #f7fafc;
+            border: 2px dashed #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .file-upload-wrapper:hover {
+            border-color: #4361ee;
+            background: #f0f3ff;
+        }
+
+        @media (max-width: 768px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .profile-stat-side { border-right: none; border-bottom: 1px solid #edf2f7; }
+        }
+    </style>
+{% endblock css %}
+
+{% block content %}
+<div class="profile-wrapper">
+    <div class="profile-card shadow-lg">
+        <div class="row g-0">
+            <div class="col-md-5 profile-stat-side">
+                <div class="profile-img-container">
+                    {% if profile.profile_picture and 'default.jpg' not in profile.profile_picture.name %}
+                        <img src="{{ profile.profile_picture.url }}" alt="Profile" class="current-photo">
+                    {% else %}
+                        <div class="default-photo">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="text-center mb-4">
+                    <h4 class="fw-bold mb-1">{{ profile.full_name|default:user.username }}</h4>
+                    <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill" style="background: rgba(67,97,238,0.1)">Member</span>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Email</label>
+                        <p>{{ profile.email|default:user.email|truncatechars:20 }}</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Gender</label>
+                        <p>{% if profile.gender == 'M' %}Male{% elif profile.gender == 'F' %}Female{% else %}—{% endif %}</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Birthday</label>
+                        <p>{{ profile.date_of_birth|date:"d M Y"|default:"—" }}</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Phone</label>
+                        <p>{{ profile.phone_number|default:"—" }}</p>
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-3 bg-white rounded shadow-sm">
+                    <label class="info-item"><label>Address</label></label>
+                    <p class="small text-muted">{{ profile.address|default:"No address set." }}</p>
+                </div>
+            </div>
+
+            <div class="col-md-7 form-side">
+                <h3 class="fw-bold mb-4">Account Settings</h3>
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        {% for field in form %}
+                            {% if field.name != 'profile_picture' %}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="text-danger x-small mt-1">{{ field.errors|striptags }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-4 mt-2">
+                        <label class="form-label">Profile Picture</label>
+                        <div class="file-upload-wrapper">
+                            <i class="fas fa-cloud-upload-alt text-primary mb-2 fs-3"></i>
+                            <p class="small text-muted mb-2">Drag and drop or click to upload</p>
+                            <input type="file" name="profile_picture" class="form-control" accept="image/*">
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4 py-2">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-light px-4 py-2 text-muted">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
